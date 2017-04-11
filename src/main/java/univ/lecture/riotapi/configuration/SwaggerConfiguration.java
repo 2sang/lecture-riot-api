@@ -49,7 +49,7 @@ public class SwaggerConfiguration {
 
     private Predicate<String> paths() {
         return or(
-                regex("/api.*")
+                regex("/api*")
         );
     }
 
