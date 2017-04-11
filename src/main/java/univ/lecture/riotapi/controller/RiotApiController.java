@@ -19,7 +19,7 @@ import java.util.Map;
  * Created by tchi on 2017. 4. 1..
  */
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/calc")
 @Log4j
 public class RiotApiController {
 	private static final String template = "%s is %f";
@@ -32,12 +32,12 @@ public class RiotApiController {
     @Value("${riot.api.key}")
     private String riotApiKey;
 
-    @RequestMapping(value = "{exp}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Summoner querySummoner(@PathVariable("exp") String summonerName) throws UnsupportedEncodingException {
-        final String url = riotApiEndpoint + "/summoner/by-name/" +
-                summonerName +
-                "?api_key=" +
-                riotApiKey;
+	@Value("{server.ip}")
+	private String serverIp
+
+    @RequestMapping(value = "/{exp}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Summoner querySummoner(@PathVariable("exp") String expression) throws UnsupportedEncodingException {
+        final String url = serverIp + ":8080" + "/api/v1/calc/" + expression;
 
         String response = restTemplate.getForObject(url, String.class);
         Map<String, Object> parsedMap = new JacksonJsonParser().parseMap(response);
@@ -45,9 +45,9 @@ public class RiotApiController {
         parsedMap.forEach((key, value) -> log.info(String.format("key [%s] type [%s] value [%s]", key, value.getClass(), value)));
 
         Map<String, Object> summonerDetail = (Map<String, Object>) parsedMap.values().toArray()[0];
-        String queriedName = (String)summonerDetail.get("name");
-        int queriedLevel = (Integer)summonerDetail.get("summonerLevel");
-        Summoner summoner = new Summoner(queriedName, queriedLevel);
+        String key = (String)summonerDetail.get("key");
+        String value = (String)summonerDetail.get("value");
+        Summoner summoner = new Summoner(key, value);
 
         return summoner;
     }
