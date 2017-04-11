@@ -22,6 +22,7 @@ import java.util.Map;
 @RequestMapping("/api/v1")
 @Log4j
 public class RiotApiController {
+	private static final String template = "%s is %f";
     @Autowired
     private RestTemplate restTemplate;
 
@@ -31,8 +32,8 @@ public class RiotApiController {
     @Value("${riot.api.key}")
     private String riotApiKey;
 
-    @RequestMapping(value = "/summoner/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Summoner querySummoner(@PathVariable("name") String summonerName) throws UnsupportedEncodingException {
+    @RequestMapping(value = "{exp}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Summoner querySummoner(@PathVariable("exp") String summonerName) throws UnsupportedEncodingException {
         final String url = riotApiEndpoint + "/summoner/by-name/" +
                 summonerName +
                 "?api_key=" +
